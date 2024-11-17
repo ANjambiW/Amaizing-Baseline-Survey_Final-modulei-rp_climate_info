@@ -1,0 +1,385 @@
+---
+title: "Amaizing  Baseline Survey_Final-modulei-rp_climate_info"
+author: "Njambi"
+format: html
+editor: visual
+---
+
+## 
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Clear the environment
+
+```{r}
+
+rm(list = ls())
+
+```
+
+## Loading necessary libraries
+
+```{r, include=FALSE}
+
+library(tidyverse) # includes the dplyr, ggplot2, tidyr, readr, stringr, forcats, tibble packages
+library(readxl)
+library(Hmisc)
+library(labelled)
+library(magrittr)
+library(datawizard)
+library(gtsummary)
+library(gt)
+library(kableExtra)
+library(flextable)
+library(splitstackshape)
+library(lubridate)
+library(foreign)
+library(haven)
+
+#library(ggplot2)
+#library(tidyr)
+#library(tibble)
+#library(dplyr)
+#library(stringr)
+
+```
+
+## Set the working directory
+
+```{r}
+# Set working directory (Not necessary since the current wd is the correct wd)
+
+setwd("C:\\Users\\awanjau\\OneDrive - CGIAR\\Alliance\\Alliance_2024\\AMAZING\\AmazingBaselineDataCleaning\\Amaizing  Baseline Survey_Final-modulei-rp_climate_info")
+      
+```
+
+## Loading data
+
+```{r}
+# Read a csv file
+
+amaizing_info_path <- "C:\\Users\\awanjau\\OneDrive - CGIAR\\Alliance\\Alliance_2024\\AMAZING\\aMaizingBaseline_Files\\Amaizing  Baseline Survey_Final-modulei-rp_climate_info.csv"
+
+amaizing_info <- read_csv(amaizing_info_path)
+
+#view(amaizing_info)
+
+dim(amaizing_info) # 
+
+```
+
+```{r}
+
+names(amaizing_info)
+```
+
+```{r}
+sort(unique(amaizing_info$i_index), na.last = TRUE)
+
+```
+
+```{r}
+sort(unique(amaizing_info$i_index1), na.last = TRUE)
+
+```
+
+```{r}
+
+info_source_levels <- c(
+  
+"Meteorological Department", "ACRE Africa",	"Government extension service", 	"Farmer Cooperatives or groups", 	"Seed traders",	"Neighbour/relative farmers",	"Internet",	"Radio",	"TV",	"Newspaper",	"Mobile phone",	"NGOs",	"Research centres",	"Indigenous knowledge/Observation", 	"Other Specify",	"Other Specify"
+
+                         )  
+
+amaizing_info <- amaizing_info %>%
+  mutate(
+    i_index1 = factor(
+      i_index1, 
+      levels = c(1:14, -222, -2222 ), 
+      labels = info_source_levels
+    )
+  
+  ) 
+
+```
+
+```{r}
+unique(amaizing_info$i_index1)
+
+```
+
+```{r}
+unique(amaizing_info$i_id)
+
+```
+
+```{r}
+amaizing_info <- amaizing_info %>%
+  mutate(
+    i_id = case_when(
+      i_id == "-999" ~ NA_character_,
+      
+      TRUE ~ i_id),
+    
+    i_id = factor(i_id))
+
+unique(amaizing_info$i_id)
+```
+
+```{r}
+unique(amaizing_info$i2)
+
+# Multi-response question
+```
+
+```{r}
+unique(amaizing_info$i2_1)
+```
+
+```{r}
+amaizing_info <- amaizing_info %>%
+  mutate(i2_1 = as.integer(i2_1))
+
+class(amaizing_info$i2_1)
+
+```
+
+```{r}
+unique(amaizing_info$i2_2)
+```
+
+```{r}
+amaizing_info <- amaizing_info %>%
+  mutate(i2_2 = as.integer(i2_2))
+
+class(amaizing_info$i2_2)
+
+```
+
+```{r}
+#
+
+sort(unique(amaizing_info$i4), na.last = TRUE)
+```
+
+```{r}
+
+info_freq_levels <- c(
+  
+"Daily",	"Weekly",	"Biweekly",	"Monthly",	"Quarterly",	"Half-annually", 	"Annually",	"Seasonally",	"Need specific",	"Other (specify)"
+                         )  
+
+amaizing_info <- amaizing_info %>%
+  mutate(
+    i4 = factor(
+      i4, 
+      levels = c(1:9, -222), 
+      labels = info_freq_levels
+    )
+  
+  ) 
+
+unique(amaizing_info$i4)
+```
+
+##### 
+
+```{r}
+# Drop this column
+
+unique(amaizing_info$i4_sp)
+```
+
+```{r}
+amaizing_info <- amaizing_info %>%
+  mutate(
+
+    i4 = as.character(i4),
+    i4 = str_replace_all(i4, "Other \\(specify\\)",
+                                              replacement = i4_sp),
+    i4 = factor(i4)
+  )
+unique(amaizing_info$i4)
+```
+
+```{r}
+unique(amaizing_info$i5)
+```
+
+```{r}
+
+amaizing_info <- amaizing_info %>%
+  mutate(
+    i5 = factor(
+      i5, 
+      levels = c(1:5),
+      labels = c("Fully reliable",	"Very reliable",	"Fairly reliable",	"Somewhat reliable",	"Unreliable")
+    )
+  )
+
+unique(amaizing_info$i5)
+```
+
+```{r}
+
+amaizing_info <- amaizing_info %>%
+  mutate(
+    i5_reversed = factor(
+      i5, 
+      levels = rev(levels(i5)),  # Reverse the levels while keeping the labels intact
+      ordered = TRUE   
+    )
+  )
+
+unique(amaizing_info$i5_reversed)
+```
+
+```{r}
+unique(amaizing_info$i6)
+```
+
+```{r}
+
+amaizing_info <- amaizing_info %>%
+  mutate(
+    i6 = factor(
+      i6, 
+      levels = c(1:5),
+      labels = c("Fully useful",	"Very useful",	"Fairly useful",	"Somewhat useful",	"Not useful")
+    )
+  )
+
+unique(amaizing_info$i6)
+```
+
+```{r}
+
+amaizing_info <- amaizing_info %>%
+  mutate(
+    i6_reversed = factor(
+      i6, 
+      levels = rev(levels(i6)),  # Reverse the levels while keeping the labels intact
+      ordered = TRUE   
+    )
+  )
+
+unique(amaizing_info$i6_reversed)
+```
+
+```{r}
+
+column_labels <- c(
+ 
+i_index = "Climate Information Services and Agro-advisory Services source repeat iteration/index",
+i_index1 = "Climate Information Services and Agro-advisory Services source level/category selected",
+i_id = "Climate Information Services and Agro-advisory Services source corresponding to i_index1",
+i2 = "What does  i_id offer?",
+i2_1 = "Weather Information",
+i2_2 = "Agro-advisory services",
+i4 = "What is  the frequency of  information received from i_id",
+#i4_sp = "What was the frequency?,
+i5 = "What is the reliability of information received from from i_id?",
+i5_reversed = "i5 reverse coded",
+i6 = "What is the usefulness of information received from  from i_id?",
+i6_reversed = "i6 reverse coded",
+PARENT_KEY = "Parent key",
+KEY = "Key",
+`SET-OF-rp_climate_info` = "Climate Information Services and Agro-advisory Services source repeat group ID"
+)
+
+```
+
+```{r}
+
+# Rename columns with characters not supported by stata
+
+amaizing_info <- amaizing_info %>%
+  
+  rename(SET_OF_rp_climate_info= `SET-OF-rp_climate_info`
+    
+         )
+
+```
+
+```{r}
+names(amaizing_info)
+```
+
+```{r}
+# Set variable/column labels
+ 
+amaizing_info <- amaizing_info %>%
+  select(i_index:i5, i5_reversed, i6, i6_reversed, PARENT_KEY, KEY, SET_OF_rp_climate_info) %>%
+  select(-i4_sp) 
+  
+names(amaizing_info)
+```
+
+```{r}
+amaizing_info <- amaizing_info %>%
+  set_variable_labels(.labels = column_labels)
+```
+
+Using the function View() to open the new data in a spreadsheet reveals the column names and labels.
+
+```{r}
+
+View(amaizing_info)
+
+```
+
+## Generate a data dictionary
+
+```{r}
+# Data dictionary
+
+amaizing_info_dict <- look_for(amaizing_info, labels = TRUE, values = TRUE) #%>%
+  #dplyr::select(-c(missing, value_labels))
+
+  gt(amaizing_info_dict)
+
+```
+
+## Export data dictionary to CSV
+
+```{r}
+
+readr::write_csv(amaizing_info_dict, "amaizing_info_dict.csv")
+
+```
+
+## Export data to CSV
+
+```{r}
+
+readr::write_csv(amaizing_info, "amaizing_info.csv")
+
+```
+
+## Save as R data
+
+```{r}
+
+save(amaizing_info, file = "amaizing_info.RData")
+
+#View(amaizing_info)
+```
+
+## Export data to SPSS
+
+```{r}
+
+write.foreign(amaizing_info, "amaizing_info.sav", "amaizing_info", package = "SPSS")
+
+```
+
+## Export data to STATA
+
+```{r}
+
+write_dta(amaizing_info, "amaizing_info.dta")
+
+```
